@@ -1,7 +1,8 @@
 (function(window){
     'use strict';
 
-    var library_name = "ImageCache";
+    var libraryName = "ImageCache";
+    var localStorageKey = "ImageCache";
 
     // http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
     function toDataUrl(url, callback){
@@ -19,7 +20,7 @@
     }
 
     // define library
-    function define_library(){
+    function defineLibrary(){
         var Library = {};
         var cache = {};
         Library.get = function(url){
@@ -32,14 +33,36 @@
                 return url;
             }
         }
+        Library.dump = function() {
+            return cache;
+        }
+        Library.save = function() {
+            try {
+                localStorage.setItem(localStorageKey, JSON.stringify(cache));
+                console.log(localStorageKey + " saved to localStorage.");
+            } catch(e) {
+                console.log("Could not save " + localStorageKey + " to localStorage: " + e);
+            }
+        }
+        Library.load = function() {
+            try {
+                var item = localStorage.getItem(localStorageKey);
+                var item_to_obj = JSON.parse(item);
+                cache = item_to_obj;
+                console.log(localStorageKey + " loaded from localStorage.");
+            } catch(e) {
+                console.log("Could not load " + localStorageKey + " from localStorage: " + e);
+            }
+
+        }
         return Library;
     }
 
     //define globally if it doesn't already exist
     if(typeof(Library) === 'undefined'){
-        window[library_name] = define_library();
+        window[libraryName] = defineLibrary();
     }
     else{
-        console.log("Error: " + library_name + " already defined.");
+        console.log("Error: " + libraryName + " already defined.");
     }
 })(window);
